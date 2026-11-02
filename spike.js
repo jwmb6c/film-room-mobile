@@ -57,30 +57,50 @@ $('speed').onchange = e => { video.playbackRate = Number(e.target.value); };
 function seekOnce(target) {
   return new Promise(resolve => {
     const started = performance.now();
-    const done = ms => { clearTimeout(timer); video.removeEventListener('seeked', onSeeked); resolve(ms); };
+    const done = ms => {
+      clearTimeout(timer);
+      video.removeEventListener('seeked', onSeeked);
+      video.removeEventListener('emptied', onGone);
+      video.removeEventListener('error', onGone);
+      resolve(ms);
+    };
     const onSeeked = () => done(performance.now() - started);
+    const onGone = () => done(null);  // the video was unloaded or failed mid-seek: don't wait out the timeout
     const timer = setTimeout(() => done(null), SEEK_TIMEOUT_MS);
     video.addEventListener('seeked', onSeeked);
+    video.addEventListener('emptied', onGone);
+    video.addEventListener('error', onGone);
     video.currentTime = target;
   });
 }
 
+// Everything that could change the video or its position is locked while the seek test runs, so a tap
+// can't skew the timings or swap the file out from under it (a swap leaves duration NaN).
+const LOCKED_DURING_TEST = ['file', 'play', 'back5', 'fwd5', 'frameBack', 'frameFwd', 'speed', 'seekTest'];
+const lockControls = locked => { for (const id of LOCKED_DURING_TEST) $(id).disabled = locked; };
+
 $('seekTest').onclick = async () => {
-  if (!ready()) return say('Pick a video and wait for it to load first.', true);
-  const button = $('seekTest');
-  button.disabled = true;
-  video.pause();
-  const times = [];
-  let stuck = 0;
-  for (let i = 1; i <= SEEKS; i++) {
-    $('r-seek').textContent = `${i} of ${SEEKS}…`;
-    const ms = await seekOnce(Math.random() * video.duration * 0.98);
-    ms === null ? stuck++ : times.push(ms);
+  if (!ready() || !Number.isFinite(video.duration)) return say('Pick a video and wait for it to load first.', true);
+  lockControls(true);
+  try {
+    video.pause();
+    const times = [];
+    let stuck = 0;
+    for (let i = 1; i <= SEEKS; i++) {
+      if (!ready() || !Number.isFinite(video.duration)) throw Error('The video was unloaded during the seek test.');
+      $('r-seek').textContent = `${i} of ${SEEKS}…`;
+      const ms = await seekOnce(Math.random() * video.duration * 0.98);
+      ms === null ? stuck++ : times.push(ms);
+    }
+    const s = summarizeSeeks(times);
+    const text = s ? `${s.count} seeks: ${s.min} / ${s.median} / ${s.max} ms (min / median / max)` : 'no seek finished';
+    $('r-seek').textContent = stuck ? `${text}; ${stuck} seek stuck` : text;
+  } catch (err) {
+    $('r-seek').textContent = 'Seek test failed';
+    say(err.message, true);
+  } finally {
+    lockControls(false);
   }
-  const s = summarizeSeeks(times);
-  const text = s ? `${s.count} seeks: ${s.min} / ${s.median} / ${s.max} ms (min / median / max)` : 'no seek finished';
-  $('r-seek').textContent = stuck ? `${text}; ${stuck} seek stuck` : text;
-  button.disabled = false;
 };
 
 const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;

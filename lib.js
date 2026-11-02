@@ -1,8 +1,9 @@
 // Small pure helpers for the video test page (and, later, the phone app).
 
-// Same arithmetic as fmt() in ../static/score.js: m:ss.s, or h:mm:ss.s from one hour up.
+// Like fmt() in ../static/score.js: m:ss.s, or h:mm:ss.s from one hour up. Rounds to tenths first so
+// 59.96 reads 1:00.0, not 0:60.0.
 export function formatTime(t) {
-  t = Math.max(0, t);
+  t = Math.round(Math.max(0, t) * 10) / 10;
   const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = (t % 60).toFixed(1).padStart(4, '0');
   return h ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
