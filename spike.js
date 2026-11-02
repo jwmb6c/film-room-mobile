@@ -103,5 +103,15 @@ $('seekTest').onclick = async () => {
   }
 };
 
+// Keep the app files on the phone so the page opens with no connection.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => { $('r-offline').textContent = 'Ready'; })
+    .catch(() => { $('r-offline').textContent = 'Not available'; });
+} else {
+  $('r-offline').textContent = 'Not available';
+}
+
 const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 $('r-mode').textContent = standalone ? 'Home-screen app' : 'Safari tab';
