@@ -4,71 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Film Room test">
+<meta name="apple-mobile-web-app-title" content="Film Room">
 <meta name="theme-color" content="#1b1b1f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Film Room video test</title>
-<style>
-  :root { color-scheme: dark; --bg: #1b1b1f; --panel: #2a2a30; --text: #f2f2f4; --muted: #9a9aa5; --accent: #e8590c; --bad: #ff6b6b; }
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
-         background: var(--bg); color: var(--text); font: 16px/1.4 -apple-system, system-ui, sans-serif; }
-  h1 { font-size: 18px; margin: 0 0 2px; }
-  .version { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
-  .pick { display: block; padding: 16px; text-align: center; background: var(--accent); border-radius: 12px; font-weight: 600; }
-  .pick input { display: none; }
-  video { display: block; width: 100%; max-height: 40vh; margin: 12px 0; background: #000; border-radius: 8px; }
-  .clock { font-size: 28px; font-variant-numeric: tabular-nums; text-align: center; }
-  .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
-  button, select { min-height: 52px; font: inherit; color: var(--text); background: var(--panel); border: 0; border-radius: 10px; }
-  button:disabled { opacity: .5; }
-  button.wide { grid-column: span 3; }
-  dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0; padding: 12px; background: var(--panel); border-radius: 10px; }
-  dt { color: var(--muted); }
-  dd { margin: 0; text-align: right; word-break: break-all; }
-  .msg { min-height: 1.4em; margin: 8px 0; }
-  .msg.bad { color: var(--bad); }
-</style>
+<link rel="stylesheet" href="style.css">
+<title>Film Room</title>
 </head>
 <body>
-<h1>Film Room video test</h1>
-<div class="version" id="version">Film Room video test v3</div>
-
-<label class="pick">Pick the game video
-  <input type="file" id="file" accept="video/*,.mp4,.m4v,.mov">
-</label>
-<div class="msg" id="msg" role="status"></div>
-
-<video id="video" playsinline preload="metadata"></video>
-<div class="clock" id="clock">0:00.0</div>
-
-<div class="controls">
-  <button id="back5">&minus;5 s</button>
-  <button id="play">Play</button>
-  <button id="fwd5">+5 s</button>
-  <button id="frameBack">&lsaquo; Frame</button>
-  <select id="speed" aria-label="Speed">
-    <option value="0.5">0.5&times;</option>
-    <option value="1" selected>1&times;</option>
-    <option value="1.5">1.5&times;</option>
-    <option value="2">2&times;</option>
-  </select>
-  <button id="frameFwd">Frame &rsaquo;</button>
-  <button id="seekTest" class="wide">Seek test (10 jumps)</button>
-</div>
-
-<dl>
-  <dt>File</dt><dd id="r-name">&ndash;</dd>
-  <dt>Size</dt><dd id="r-size">&ndash;</dd>
-  <dt>Metadata after pick</dt><dd id="r-load">&ndash;</dd>
-  <dt>Length</dt><dd id="r-duration">&ndash;</dd>
-  <dt>Picture</dt><dd id="r-picture">&ndash;</dd>
-  <dt>Works offline</dt><dd id="r-offline">Checking&hellip;</dd>
-  <dt>Running as</dt><dd id="r-mode">&ndash;</dd>
-  <dt>Seek test</dt><dd id="r-seek">&ndash;</dd>
-</dl>
-
-<script type="module" src="spike.js"></script>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
 </body>
 </html>

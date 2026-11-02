@@ -27,6 +27,16 @@ export function describeMediaError(code) {
   return MEDIA_ERRORS[code] || 'The video failed to load for an unknown reason.';
 }
 
+// What to ask before leaving a game, or null when nothing is at risk. saveFailed means the last save on the
+// phone itself failed, so scoring since then exists only on screen.
+export function leaveWarning({ changes, saveFailed }) {
+  if (saveFailed) {
+    return 'Your latest scoring is NOT saved on this phone and will be lost if you leave. Tap Save to Files first. Leave anyway?';
+  }
+  if (changes) return `${changes} change${changes === 1 ? '' : 's'} not saved to Files yet (they stay on this phone). Leave anyway?`;
+  return null;
+}
+
 // Same extensions as VIDEO_TYPES in ../game.py.
 const VIDEO_EXTENSIONS = /\.(mp4|m4v|mov|webm)$/i;
 
